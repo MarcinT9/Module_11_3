@@ -141,22 +141,16 @@ def tab3_barh_store_subcat(chosen_cat):
     fig = go.Figure(data=data,layout=go.Layout(barmode='stack',margin={'t':20,}))
     return fig
 
-@app.callback(Output('barh-store2-subcat','figure'),
+@app.callback(Output('pie-store-subcat','figure'),
             [Input('store2_dropdown','value')])
-def tab3_barh2_store_subcat(chosen_cat):
+def tab3_pie_store_subcat(chosen_cat):
 
-    name_days = pd.date_range(start='2016-01-25', freq='D', periods=3)
+    name_days = pd.transactions(start='2016-01-25', freq='D', periods=3)
     name_days.dt.day_name()
 
-    grouped = df.merged[(df.merged['total_amt']>0)&(df.merged['Store_type']==chosen_cat)].pivot_table(index=name_days,
-    columns='Gender',values='total_amt',aggfunc='sum').assign(_sum=lambda x: x['F']+x['M']).sort_values(by='_sum').round(2)
-
-    traces = []
-    for col in ['F','M']:
-        traces.append(go.Bar(x=grouped[col],y=grouped.index,orientation='h',name=col))
-
-    data = traces
-    fig = go.Figure(data=data,layout=go.Layout(barmode='stack',margin={'t':20,}))
+    grouped = df[df['total_amt']>0].groupby('Store_type')['total_amt'].sum()
+    
+    fig = go.Figure(data=[go.Pie(labels=name_days.index,values=grouped.values)])
     return fig
 
 if __name__ == '__main__':
