@@ -16,14 +16,14 @@ app = dash.Dash()
 class db:
     def __init__(self):
         self.transactions = db.transation_init()
-        self.cc = pd.read_csv(r'db\country_codes.csv',index_col=0)
-        self.customers = pd.read_csv(r'db\customers.csv',index_col=0)
-        self.prod_info = pd.read_csv(r'db\prod_cat_info.csv')
+        self.cc = pd.read_csv(r'db/country_codes.csv',index_col=0)
+        self.customers = pd.read_csv(r'db/customers.csv',index_col=0)
+        self.prod_info = pd.read_csv(r'db/prod_cat_info.csv')
 
     @staticmethod
     def transation_init():
         transactions = pd.DataFrame()
-        src = r'db\transactions'
+        src = r'db/transactions'
         for filename in os.listdir(src):
             transactions = transactions.append(pd.read_csv(os.path.join(src,filename),index_col=0))
 
@@ -141,17 +141,16 @@ def tab3_barh_store_subcat(chosen_cat):
     fig = go.Figure(data=data,layout=go.Layout(barmode='stack',margin={'t':20,}))
     return fig
 
-@app.callback(Output('pie-store-subcat','figure'),
+@app.callback(Output('barh-store2-subcat','figure'),
             [Input('store2_dropdown','value')])
 def tab3_pie_store_subcat(chosen_cat):
 
-    name_days = pd.transactions(start='2016-01-25', freq='D', periods=3)
-    name_days.dt.day_name()
+    grouped = df.merged[(df.merged['total_amt']>0)&(df.merged['Store_type']==chosen_cat)].groupby('tran_date')['total_amt'].sum()
+    labels = grouped.index.day_name()
 
-    grouped = df[df['total_amt']>0].groupby('Store_type')['total_amt'].sum()
-    
-    fig = go.Figure(data=[go.Pie(labels=name_days.index,values=grouped.values)])
+    fig = go.Figure(data=[go.Pie(labels=labels, values=grouped.values, sort=False)])
     return fig
+
 
 if __name__ == '__main__':
     app.run_server()
