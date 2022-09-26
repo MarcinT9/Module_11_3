@@ -10,6 +10,7 @@ import tab3
 from class_db import db
 
 app = dash.Dash()
+  
 df = db()
 df.merge()
 
@@ -111,6 +112,7 @@ def tab3_pie_store_subcat(chosen_cat):
 
     fig = go.Figure(data=[go.Pie(labels=labels, values=grouped.values, sort=False)])
     return fig
+
 
 if __name__ == '__main__':
     app.run_server()
